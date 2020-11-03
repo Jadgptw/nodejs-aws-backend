@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.1.0
+  version: 1.0.0
   title: Preference public API
   description: Preference public API
   license:
@@ -48,6 +48,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+servers:
+  - url: https://q0v7444ri2.execute-api.eu-west-1.amazonaws.com/dev/
 components:
   schemas:
     ProductsResponse:
@@ -93,18 +95,18 @@ components:
           example: 100
         count:
           type: integer
-            description: Product count
-            example: 10
+          description: Product count
+          example: 10
 
     Error:
       title: Error
-        type: object
-        properties:
-          error:
-            title: Error
-            type: object
-            properties:
-              message:
-                type: string
-                description: Error message
-                example: Product not found
+      type: object
+      properties:
+        error:
+          title: Error
+          type: object
+          properties:
+            message:
+              type: string
+              description: Error message
+              example: Product not found
