@@ -1,0 +1,112 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Preference public API
+  description: Preference public API
+  license:
+    name: MIT
+    url: http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
+paths:
+  /products:
+    get:
+      description: Get products list
+      summary: Get products list
+      tags:
+        - products
+      operationId: ProductsList
+      responses:
+        "200":
+          description: Products list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductsResponse"
+  /products/{productId}:
+    get:
+      description: Get product by id
+      summary: Get product by id
+      tags:
+        - product
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Product unique identifier
+          schema:
+            type: string
+      operationId: Product
+      responses:
+        "200":
+          description: Product object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+servers:
+  - url: https://q0v7444ri2.execute-api.eu-west-1.amazonaws.com/dev/
+components:
+  schemas:
+    ProductsResponse:
+      title: ProductsResponse
+      type: object
+      properties:
+        data:
+          title: Data
+          type: object
+          properties:
+            products:
+              type: array
+              items:
+                $ref: "#/components/schemas/Product"
+        statusCode:
+          type: number
+
+    Product:
+      title: Product
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - price
+        - count
+      properties:
+        id:
+          type: string
+          description: Product id
+          example: 7567ec4b-b10c-48c5-9345-fc73c48a80a2
+        title:
+          type: string
+          description: Product title
+          example: ProductTop.
+        description:
+          type: string
+          description: Product description
+          example: Short Product Description2.
+        price:
+          type: integer
+          description: Product price
+          example: 100
+        count:
+          type: integer
+          description: Product count
+          example: 10
+
+    Error:
+      title: Error
+      type: object
+      properties:
+        error:
+          title: Error
+          type: object
+          properties:
+            message:
+              type: string
+              description: Error message
+              example: Product not found

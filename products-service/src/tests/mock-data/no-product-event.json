@@ -1,0 +1,8 @@
+{
+  "resource": "/",
+  "path": "products/{productId}",
+  "httpMethod": "GET",
+  "pathParameters": {
+    "productId": "none"
+  }
+}
