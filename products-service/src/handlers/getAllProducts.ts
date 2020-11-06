@@ -1,27 +1,18 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import 'source-map-support/register';
 
-import { Client } from "pg";
-import { dbOptions } from "../../config";
-
 import { sendError } from "../utils/send-error";
 import { sendResponse } from "../utils/send-response";
-
-const getProductsListQueryString = "SELECT p.*, s.count FROM products p LEFT JOIN stocks s ON p.id = s.product_id";
+import { productService } from "../services/product-service";
 
 export const getProductsList: APIGatewayProxyHandler = async (event, context) => {
-  console.log(`Event: ${event}, Context: ${context}`);
-  const client = new Client(dbOptions);
+  console.log(`Event: ${JSON.stringify(event)}, Context: ${JSON.stringify(context)}`);
 
   try {
-    await client.connect();
-
-    const { rows: products } = await client.query(getProductsListQueryString);
+    const { rows: products } = await productService.getProductList();
 
     return sendResponse({ products })
   } catch (e) {
     return sendError(e);
-  } finally {
-    client.end()
   }
 };
