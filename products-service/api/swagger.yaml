@@ -21,6 +21,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProductsResponse"
+    post:
+      description: Create product
+      summary: Create product
+      tags:
+        - product
+      operationId: ProductCreate
+      requestBody:
+        description: Product to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        "201":
+          description: Product object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /products/{productId}:
     get:
       description: Get product by id
@@ -71,11 +97,9 @@ components:
       title: Product
       type: object
       required:
-        - id
         - title
         - description
         - price
-        - count
       properties:
         id:
           type: string
