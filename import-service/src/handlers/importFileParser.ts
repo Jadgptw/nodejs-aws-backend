@@ -3,9 +3,9 @@ import 'source-map-support/register';
 
 import csv from "csv-parser";
 
-import { s3BucketService } from "../services/s3BucketService";
+import { S3BucketService } from "../services/s3BucketService";
 
-export const importFileParser = async (event: S3Event, context) => {
+export const getImportFileParser: (s3BucketService: S3BucketService) => (event: S3Event, context: any) => Promise<void> = s3BucketService => async (event: S3Event, context) => {
   console.log(`Event: ${JSON.stringify(event)}, Context: ${JSON.stringify(context)}`);
 
   try {

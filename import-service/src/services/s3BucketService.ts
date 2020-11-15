@@ -7,7 +7,11 @@ import { BUCKET } from "../config";
 
 class S3BucketService {
   private readonly BUCKET = BUCKET;
-  private readonly s3 = new S3({ region: "eu-west-1", signatureVersion: "v4" });
+  private readonly s3: S3;
+
+  constructor(Bucket) {
+    this.s3 = new Bucket({ region: "eu-west-1", signatureVersion: "v4" });
+  }
 
   public async getSignedUrl(name: string): Promise<string> {
     const params = {
@@ -23,8 +27,7 @@ class S3BucketService {
     return this.s3.getObject({
       Bucket: this.BUCKET,
       Key: key
-    })
-      .createReadStream()
+    }).createReadStream()
   }
 
   public async copyObject(key: string, from: string, to: string): Promise<PromiseResult<CopyObjectOutput, AWSError>> {
@@ -43,6 +46,4 @@ class S3BucketService {
   }
 }
 
-const s3BucketService = new S3BucketService();
-
-export { s3BucketService }
+export { S3BucketService };

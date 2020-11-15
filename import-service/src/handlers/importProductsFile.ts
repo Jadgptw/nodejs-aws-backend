@@ -3,9 +3,9 @@ import 'source-map-support/register';
 
 import { sendError } from "../utils/send-error";
 import { sendResponse } from "../utils/send-response";
-import { s3BucketService } from "../services/s3BucketService";
+import { S3BucketService } from "../services/s3BucketService";
 
-export const importProductsFile: APIGatewayProxyHandler = async (event, context) => {
+export const getImportProductsFile: (s3BucketService: S3BucketService) => APIGatewayProxyHandler = s3BucketService => async (event, context) => {
   console.log(`Event: ${JSON.stringify(event)}, Context: ${JSON.stringify(context)}`);
 
   try {
