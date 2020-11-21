@@ -3,9 +3,9 @@ import 'source-map-support/register';
 
 import { sendError } from "../utils/send-error";
 import { sendResponse } from "../utils/send-response";
-import { productService } from "../services/product-service";
+import { ProductService } from "../services/product-service";
 
-export const getProductsList: APIGatewayProxyHandler = async (event, context) => {
+export const getGetProductsList: (productService: ProductService) => APIGatewayProxyHandler = (productService: ProductService) => async (event, context) => {
   console.log(`Event: ${JSON.stringify(event)}, Context: ${JSON.stringify(context)}`);
 
   try {

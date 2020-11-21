@@ -7,9 +7,9 @@ import { sendError } from "../utils/send-error";
 import { sendResponse } from "../utils/send-response";
 import { Product } from "../models/product";
 import { productSchema } from "../validators/product-validator";
-import { productService } from "../services/product-service";
+import { ProductService } from "../services/product-service";
 
-export const createProduct: APIGatewayProxyHandler = async (event, context) => {
+export const getCreateProduct: (productService: ProductService) => APIGatewayProxyHandler = (productService: ProductService) => async (event, context) => {
   console.log(`Event: ${JSON.stringify(event)}, Context: ${JSON.stringify(context)}`);
   const data: Product = JSON.parse(event.body);
 

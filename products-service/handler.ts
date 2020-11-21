@@ -1,8 +1,25 @@
 import "source-map-support/register";
 
-import { getProductsList } from "./src/handlers/getAllProducts";
-import { getProductsById } from "./src/handlers/getProductById";
-import { createProduct } from "./src/handlers/createProduct";
+import { SNS } from "aws-sdk";
+import { Client } from "pg";
+
+import { dbOptions } from "./config";
+
+import { getGetProductsList } from "./src/handlers/getAllProducts";
+import { getGetProductsById } from "./src/handlers/getProductById";
+import { getCreateProduct } from "./src/handlers/createProduct";
+import { getCatalogBatchProcess } from "./src/handlers/catalogBatchProcess";
 import { getApiDoc } from "./src/handlers/swagger";
 
-export { getProductsList, getProductsById, createProduct, getApiDoc };
+import { SnsService } from "./src/services/SnsService";
+import { ProductService } from "./src/services/product-service";
+
+const productService = new ProductService(new Client(dbOptions));
+const snsService = new SnsService(SNS);
+
+const getProductsList = getGetProductsList(productService);
+const getProductsById = getGetProductsById(productService);
+const createProduct = getCreateProduct(productService);
+const catalogBatchProcess = getCatalogBatchProcess(productService, snsService);
+
+export { getProductsList, getProductsById, createProduct, catalogBatchProcess, getApiDoc };

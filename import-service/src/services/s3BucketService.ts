@@ -3,7 +3,7 @@ import { PromiseResult } from "aws-sdk/lib/request";
 import { CopyObjectOutput, DeleteObjectOutput } from "aws-sdk/clients/s3";
 import stream from "stream";
 
-import { BUCKET } from "../config";
+import { BUCKET } from "../../config";
 
 class S3BucketService {
   private readonly BUCKET = BUCKET;
