@@ -13,13 +13,24 @@ class SnsService {
   }
 
   public async publishMessage(products: Array<Product>, invalidProducts: Array<Product>): Promise<PromiseResult<PublishResponse, AWSError>> {
-    const Message = `${products} records were successfully added to the database.${invalidProducts.length ? ` Invalid products found: ${invalidProducts}` : ""}`;
+    const succeededMessage = `${JSON.stringify(products)} records were successfully added to the database.`;
+    const errorMessage = `Invalid products found: ${JSON.stringify(invalidProducts)}`;
+    const Message = `
+      ${products.length ? succeededMessage : ""} 
+      ${invalidProducts.length ? errorMessage : ""}
+    `;
 
     return await this.sns.publish(
       {
         Subject: "New Products are added to the database",
         Message,
-        TopicArn: this.SNS_ARN
+        TopicArn: this.SNS_ARN,
+        MessageAttributes: {
+          Status: {
+            DataType: "String",
+            StringValue: invalidProducts.length ? "HasErrors" : "Succeeded"
+          }
+        }
       },
       () => console.log(`Email is sent with: "${Message}" message`)
     ).promise();

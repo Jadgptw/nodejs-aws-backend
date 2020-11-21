@@ -58,13 +58,33 @@ const serverlessConfiguration: Serverless = {
           TopicName: TOPIC_NAME
         }
       },
-      SNSSubscription: {
+      SNSSucceededSubscription: {
         Type: "AWS::SNS::Subscription",
         Properties: {
-          Endpoint: "aliaksandr.hordzin@gmail.com",
+          Endpoint: "jadgptw@mail.ru",
           Protocol: "email",
           TopicArn: {
             Ref: "SNSTopic"
+          },
+          FilterPolicy: {
+            Status: [
+              "Succeeded"
+            ]
+          }
+        }
+      },
+      SNSErrorsSubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Endpoint: "gordin.alexander90@gmail.com",
+          Protocol: "email",
+          TopicArn: {
+            Ref: "SNSTopic"
+          },
+          FilterPolicy: {
+            Status: [
+              "HasErrors"
+            ]
           }
         }
       }
