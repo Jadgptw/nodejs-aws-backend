@@ -23,15 +23,13 @@ describe('catalogBatchProcess method.', () => {
   let productService: ProductService;
   let snsService: SnsService;
   let catalogBatchProcess;
-  let client;
 
   beforeEach(() => {
     setSDKInstance(AWS);
     // @ts-ignore
     mock("SNS", "publish", (params: { Key: string }, callback) => callback(null, "success"));
 
-    client = new Client();
-    productService = new ProductService(client);
+    productService = new ProductService(Client);
     snsService = new SnsService(SNS);
     catalogBatchProcess = getCatalogBatchProcess(productService, snsService);
   });
@@ -43,17 +41,17 @@ describe('catalogBatchProcess method.', () => {
 
   test('should call connect message', async () => {
     await catalogBatchProcess(catalogBatchProcessEvent);
-    expect(client.connect).toBeCalledTimes(1);
+    expect(productService.client.connect).toBeCalledTimes(1);
   });
 
   test('should call query message', async () => {
     await catalogBatchProcess(catalogBatchProcessEvent);
-    expect(client.query).toBeCalledTimes(3);
+    expect(productService.client.query).toBeCalledTimes(4);
   });
 
   test('should call end message', async () => {
     await catalogBatchProcess(catalogBatchProcessEvent);
-    expect(client.end).toBeCalledTimes(1);
+    expect(productService.client.end).toBeCalledTimes(1);
   });
 
 });

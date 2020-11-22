@@ -12,10 +12,10 @@ export const getCatalogBatchProcess = (productsService: ProductService, snsServi
 
   try {
     const { productsToSave, invalidProducts } = filterNonValidProducts(event.Records);
-    const products = await productsService.bulkProductsCreate(productsToSave);
+    const products =  productsToSave.length ? await productsService.bulkProductsCreate(productsToSave) : [];
 
     await snsService.publishMessage(products, invalidProducts);
-    console.log(`${products} records were successfully added to the database.${invalidProducts.length ? ` Invalid products found: ${invalidProducts}` : ""}`);
+    console.log(`${JSON.stringify(products)} records were successfully added to the database.${invalidProducts.length ? ` Invalid products found: ${JSON.stringify(invalidProducts)}` : ""}`);
   } catch (e) {
     console.error(`Error appeared while adding data to the database: ${e}`)
   }

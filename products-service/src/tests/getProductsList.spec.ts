@@ -20,7 +20,7 @@ describe('getProductsList method.', () => {
   let getProductsList;
 
   beforeEach(() => {
-    productService = new ProductService(new Client());
+    productService = new ProductService(Client);
     getProductsList = getGetProductsList(productService);
   });
 

@@ -1,4 +1,4 @@
-import { Client, QueryResult } from "pg";
+import {Client, ClientConfig, QueryResult} from "pg";
 
 import { NOT_FOUND, getStatusText } from "http-status-codes";
 
@@ -12,20 +12,26 @@ class ProductService {
   private readonly createStockQueryString = "INSERT INTO stocks (product_id, count) VALUES ($1, $2) RETURNING count";
   // @ts-ignore
   private readonly getBulkCreateProductsString = (products: Array<Product>) => products.reduce((result, product, i) => {
-    return `${result} ($${1 + 3 * i}, $${2 + 3 * i}, $${3 + 3 * i})${i + 1 !== products.length ? "," : " RETURNING id"})`
+    return `${result} ($${1 + 3 * i}, $${2 + 3 * i}, $${3 + 3 * i})${i + 1 !== products.length ? "," : " RETURNING id"}`
   }, "INSERT INTO products (title, description, price) VALUES");
   // @ts-ignore
-  private readonly getBulkCreateStocksString = (ids: Array<number>) => products.reduce((result, id, i) => {
-    return `${result} ($${1 + 2 * i}, $${2 + 2 * i})${i + 1 !== ids.length ? "," : " RETURNING count"})`
+  private readonly getBulkCreateStocksString = (ids: Array<number>) => ids.reduce((result, id, i) => {
+    return `${result} ($${1 + 2 * i}, $${2 + 2 * i})${i + 1 !== ids.length ? "," : " RETURNING count"}`
   }, "INSERT INTO stocks (product_id, count) VALUES");
 
-  private readonly client: Client;
+  private readonly Client;
+  private readonly dbOptions: ClientConfig;
 
-  constructor(client: Client) {
-    this.client = client;
+  public client: Client;
+
+  constructor(Client, dbOptions?: ClientConfig) {
+    this.Client = Client;
+    this.dbOptions = dbOptions;
   }
 
   public async getProductList(): Promise<QueryResult<Array<Product>>> {
+    this.client = new this.Client(this.dbOptions);
+
     try {
       await this.client.connect();
 
@@ -36,6 +42,8 @@ class ProductService {
   }
 
   public async getProductsById(id: string): Promise<QueryResult<Product>> {
+    this.client = new this.Client(this.dbOptions);
+
     try {
       await this.client.connect();
       const product = await this.client.query(this.getProductQueryString, [id]);
@@ -50,6 +58,8 @@ class ProductService {
   }
 
   public async createProduct({ title, description, price, count }: Product): Promise<QueryResult<Product>> {
+    this.client = new this.Client(this.dbOptions);
+
     try {
       await this.client.connect();
 
@@ -68,15 +78,17 @@ class ProductService {
   }
 
   public async bulkProductsCreate(productsToSave: Array<Product>): Promise<Array<Product>> {
+    this.client = new this.Client(this.dbOptions);
+
     try {
       await this.client.connect();
 
       await this.client.query("BEGIN");
-      const { rows: ids } = await this.client.query(this.getBulkCreateProductsString(productsToSave), this.getBulkInsertProductValues(productsToSave));
-      await this.client.query(this.getBulkCreateStocksString(ids), this.getBulkInsertStockValues(ids, productsToSave.map(product => product.count || 0)));
+      const { rows: productsIds } = await this.client.query(this.getBulkCreateProductsString(productsToSave), this.getBulkInsertProductValues(productsToSave));
+      await this.client.query(this.getBulkCreateStocksString(productsIds), this.getBulkInsertStockValues(productsIds, productsToSave.map(product => product.count || 0)));
       await this.client.query('COMMIT');
 
-      return productsToSave.map((product, i) => ({ ...product, id: ids[i] }))
+      return productsToSave.map((product, i) => ({ ...product, id: productsIds[i] }))
     } catch (e) {
       await this.client.query('ROLLBACK');
       throw e;
@@ -94,10 +106,10 @@ class ProductService {
     ], []);
   }
 
-  private getBulkInsertStockValues(ids: Array<string>, countValues: Array<number>): Array<any> {
-    return ids.reduce((result, id, i) => [
+  private getBulkInsertStockValues(products: Array<Product>, countValues: Array<number>): Array<any> {
+    return products.reduce((result, product, i) => [
       ...result,
-      id,
+      product.id,
       countValues[i]
     ], []);
   }

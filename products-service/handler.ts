@@ -14,7 +14,7 @@ import { getApiDoc } from "./src/handlers/swagger";
 import { SnsService } from "./src/services/SnsService";
 import { ProductService } from "./src/services/product-service";
 
-const productService = new ProductService(new Client(dbOptions));
+const productService = new ProductService(Client, dbOptions);
 const snsService = new SnsService(SNS);
 
 const getProductsList = getGetProductsList(productService);

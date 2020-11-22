@@ -24,7 +24,7 @@ describe('getProductById method.', () => {
 
   test('should return 200 status code if Id exists', async () => {
     // @ts-ignore
-    const productService = new ProductService(new Client({ rows: [products[3]] }));
+    const productService = new ProductService(Client, { rows: [products[3]] });
     const getProductsById = getGetProductsById(productService);
     // @ts-ignore
     const result: { statusCode: number, body: any } = await getProductsById(productEvent);
@@ -33,7 +33,7 @@ describe('getProductById method.', () => {
 
   test('should return product if Id exists', async () => {
     // @ts-ignore
-    const productService = new ProductService(new Client({ rows: [products[3]] }));
+    const productService = new ProductService(Client, { rows: [products[3]] });
     const getProductsById = getGetProductsById(productService);
     // @ts-ignore
     const result: { statusCode: number, body: any } = await getProductsById(productEvent);
@@ -49,7 +49,7 @@ describe('getProductById method.', () => {
   });
 
   test('should return 404 status code if Id doesn\'t exist', async () => {
-    const productService = new ProductService(new Client());
+    const productService = new ProductService(Client);
     const getProductsById = getGetProductsById(productService);
     // @ts-ignore
     const result: { statusCode: number, body: any } = await getProductsById(noProductEvent);
@@ -57,7 +57,7 @@ describe('getProductById method.', () => {
   });
 
   test('should return error message "Product not found"', async () => {
-    const productService = new ProductService(new Client());
+    const productService = new ProductService(Client);
     const getProductsById = getGetProductsById(productService);
     // @ts-ignore
     const result: { statusCode: number, body: any } = await getProductsById(noProductEvent);
