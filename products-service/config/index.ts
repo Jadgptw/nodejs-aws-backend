@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 import { ClientConfig } from "pg";
 
+const SQS_NAME = "catalogItemsQueue";
 const TOPIC_NAME = "catalogItemsTopic";
-const CATALOG_ITEMS_QUEUE_ARN = "arn:aws:sqs:eu-west-1:070294412691:catalogItemsQueue";
 
 dotenv.config({ path: './config/config.env' });
 
@@ -20,4 +20,4 @@ const dbOptions: ClientConfig = {
   connectionTimeoutMillis: 5000
 };
 
-export { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD, TOPIC_NAME, CATALOG_ITEMS_QUEUE_ARN, dbOptions };
+export { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD, SQS_NAME, TOPIC_NAME, dbOptions };

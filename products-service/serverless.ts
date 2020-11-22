@@ -1,5 +1,5 @@
 import { Serverless } from 'serverless/aws';
-import { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD, TOPIC_NAME, CATALOG_ITEMS_QUEUE_ARN } from './config';
+import { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD, TOPIC_NAME, SQS_NAME } from './config';
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -39,7 +39,12 @@ const serverlessConfiguration: Serverless = {
       {
         Effect: "Allow",
         Action: "sqs:*",
-        Resource: CATALOG_ITEMS_QUEUE_ARN
+        Resource: {
+          "Fn::GetAtt": [
+            "SQSQueue",
+            "Arn"
+          ]
+        }
       },
       {
         Effect: "Allow",
@@ -52,6 +57,12 @@ const serverlessConfiguration: Serverless = {
   },
   resources: {
     Resources: {
+      SQSQueue: {
+        Type: "AWS::SQS::Queue",
+        Properties: {
+          QueueName: SQS_NAME
+        }
+      },
       SNSTopic: {
         Type: "AWS::SNS::Topic",
         Properties: {
@@ -86,6 +97,21 @@ const serverlessConfiguration: Serverless = {
               "HasErrors"
             ]
           }
+        }
+      }
+    },
+    Outputs: {
+      SQSQueueURL: {
+        Value: {
+          Ref: "SQSQueue"
+        }
+      },
+      SQSQueueArn: {
+        Value: {
+          "Fn::GetAtt": [
+            "SQSQueue",
+            "Arn"
+          ]
         }
       }
     }
@@ -127,13 +153,18 @@ const serverlessConfiguration: Serverless = {
         }
       ]
     },
-    catalogBatchProcess: {
+    catalogBatchProcesses: {
       handler: 'handler.catalogBatchProcess',
       events: [
         {
           sqs: {
             batchSize: 5,
-            arn: CATALOG_ITEMS_QUEUE_ARN
+            arn: {
+              "Fn::GetAtt": [
+                "SQSQueue",
+                "Arn"
+              ]
+            }
           }
         }
       ]
