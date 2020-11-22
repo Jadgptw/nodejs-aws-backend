@@ -1,5 +1,5 @@
 import { Serverless } from 'serverless/aws';
-import { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD } from './config';
+import { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD, TOPIC_NAME, SQS_NAME } from './config';
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -26,12 +26,95 @@ const serverlessConfiguration: Serverless = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      SNS_ARN: {
+        Ref: "SNSTopic"
+      },
       PG_HOST,
       PG_PORT,
       PG_DATABASE,
       PG_USERNAME,
       PG_PASSWORD
     },
+    iamRoleStatements: [
+      {
+        Effect: "Allow",
+        Action: "sqs:*",
+        Resource: {
+          "Fn::GetAtt": [
+            "SQSQueue",
+            "Arn"
+          ]
+        }
+      },
+      {
+        Effect: "Allow",
+        Action: "sns:*",
+        Resource: {
+          Ref: "SNSTopic"
+        }
+      }
+    ]
+  },
+  resources: {
+    Resources: {
+      SQSQueue: {
+        Type: "AWS::SQS::Queue",
+        Properties: {
+          QueueName: SQS_NAME
+        }
+      },
+      SNSTopic: {
+        Type: "AWS::SNS::Topic",
+        Properties: {
+          TopicName: TOPIC_NAME
+        }
+      },
+      SNSSucceededSubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Endpoint: "jadgptw@mail.ru",
+          Protocol: "email",
+          TopicArn: {
+            Ref: "SNSTopic"
+          },
+          FilterPolicy: {
+            Status: [
+              "Succeeded"
+            ]
+          }
+        }
+      },
+      SNSErrorsSubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Endpoint: "gordin.alexander90@gmail.com",
+          Protocol: "email",
+          TopicArn: {
+            Ref: "SNSTopic"
+          },
+          FilterPolicy: {
+            Status: [
+              "HasErrors"
+            ]
+          }
+        }
+      }
+    },
+    Outputs: {
+      SQSQueueURL: {
+        Value: {
+          Ref: "SQSQueue"
+        }
+      },
+      SQSQueueArn: {
+        Value: {
+          "Fn::GetAtt": [
+            "SQSQueue",
+            "Arn"
+          ]
+        }
+      }
+    }
   },
   functions: {
     getProductsList: {
@@ -66,6 +149,22 @@ const serverlessConfiguration: Serverless = {
             method: 'post',
             path: 'products',
             cors: true
+          }
+        }
+      ]
+    },
+    catalogBatchProcesses: {
+      handler: 'handler.catalogBatchProcess',
+      events: [
+        {
+          sqs: {
+            batchSize: 5,
+            arn: {
+              "Fn::GetAtt": [
+                "SQSQueue",
+                "Arn"
+              ]
+            }
           }
         }
       ]

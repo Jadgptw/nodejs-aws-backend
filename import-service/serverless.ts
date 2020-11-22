@@ -1,6 +1,6 @@
 import { Serverless } from 'serverless/aws';
 
-import { BUCKET } from "./src/config";
+import { BUCKET, SQS_ARN, SQS_URL } from "./config";
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -27,6 +27,7 @@ const serverlessConfiguration: Serverless = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      SQS_URL
     },
     iamRoleStatements: [
       {
@@ -38,6 +39,11 @@ const serverlessConfiguration: Serverless = {
         Effect: "Allow",
         Action: "s3:*",
         Resource: `arn:aws:s3:::${BUCKET}/*`
+      },
+      {
+        Effect: "Allow",
+        Action: "sqs:*",
+        Resource: SQS_ARN
       }
     ]
   },
