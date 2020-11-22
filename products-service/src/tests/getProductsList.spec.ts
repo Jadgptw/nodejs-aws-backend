@@ -1,7 +1,8 @@
+import products from "../mock-data/products.json";
+
 import { Client } from "pg";
 
 import { getGetProductsList } from "../handlers/getAllProducts";
-import products from "../mock-data/products.json";
 import { Product } from "../models/product";
 import { ProductService } from "../services/product-service";
 
