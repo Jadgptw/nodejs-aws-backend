@@ -14,7 +14,10 @@ const serverlessConfiguration: Serverless = {
     webpack: {
       webpackConfig: './webpack.config.js',
       includeModules: true
-    }
+    },
+    basicAuthorizerArn: {
+      'Fn::ImportValue': 'basicAuthorizerArn',
+    },
   },
   // Add the serverless-webpack plugin
   plugins: ['serverless-webpack'],
@@ -47,6 +50,36 @@ const serverlessConfiguration: Serverless = {
       }
     ]
   },
+  resources: {
+    Resources: {
+      GatewayResponseAccessDenied: {
+        Type: 'AWS::ApiGateway::GatewayResponse',
+        Properties: {
+          RestApiId: {
+            Ref: 'ApiGatewayRestApi'
+          },
+          ResponseType: 'ACCESS_DENIED',
+          ResponseParameters: {
+            'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+            'gatewayresponse.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
+      },
+      GatewayResponseUnauthorized: {
+        Type: 'AWS::ApiGateway::GatewayResponse',
+        Properties: {
+          RestApiId: {
+            Ref: 'ApiGatewayRestApi'
+          },
+          ResponseType: 'UNAUTHORIZED',
+          ResponseParameters: {
+            'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+            'gatewayresponse.header.Access-Control-Allow-Headers': "'*'",
+          },
+        }
+      }
+    }
+  },
   functions: {
     importProductsFile: {
       handler: 'handler.importProductsFile',
@@ -65,7 +98,7 @@ const serverlessConfiguration: Serverless = {
             cors: true,
             authorizer: {
               name: "basicAuthorizer",
-              arn: "arn:aws:lambda:eu-west-1:070294412691:function:authorization-service-dev-basicAuthorizer",
+              arn: '${self:custom.basicAuthorizerArn}',
               resultTtlInSeconds: 0,
               identitySource: "method.request.header.Authorization",
               type: "token"

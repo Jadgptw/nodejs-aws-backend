@@ -33,6 +33,19 @@ const serverlessConfiguration: Serverless = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
     },
   },
+  resources: {
+    Resources: {},
+    Outputs: {
+      basicAuthorizerARN: {
+        Value: {
+          'Fn::GetAtt': ['BasicAuthorizerLambdaFunction', 'Arn']
+        },
+        Export: {
+          Name: 'basicAuthorizerArn',
+        }
+      }
+    }
+  },
   functions: {
     basicAuthorizer: {
       handler: 'handler.basicAuthorizer',
