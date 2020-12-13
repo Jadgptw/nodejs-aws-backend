@@ -104,6 +104,9 @@ const serverlessConfiguration: Serverless = {
       SQSQueueURL: {
         Value: {
           Ref: "SQSQueue"
+        },
+        Export: {
+          Name: 'SQSQueueURL',
         }
       },
       SQSQueueArn: {
@@ -112,6 +115,9 @@ const serverlessConfiguration: Serverless = {
             "SQSQueue",
             "Arn"
           ]
+        },
+        Export: {
+          Name: 'SQSQueueArn',
         }
       }
     }
