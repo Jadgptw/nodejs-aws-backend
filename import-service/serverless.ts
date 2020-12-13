@@ -1,6 +1,6 @@
 import { Serverless } from 'serverless/aws';
 
-import { BUCKET, SQS_ARN, SQS_URL } from "./config";
+import { BUCKET } from "./config";
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -18,6 +18,12 @@ const serverlessConfiguration: Serverless = {
     basicAuthorizerArn: {
       'Fn::ImportValue': 'basicAuthorizerArn',
     },
+    SQSQueueArn: {
+      'Fn::ImportValue': 'SQSQueueArn',
+    },
+    SQSQueueURL: {
+      'Fn::ImportValue': 'SQSQueueURL',
+    }
   },
   // Add the serverless-webpack plugin
   plugins: ['serverless-webpack'],
@@ -30,7 +36,7 @@ const serverlessConfiguration: Serverless = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-      SQS_URL
+      SQS_URL: '${self:custom.SQSQueueURL}'
     },
     iamRoleStatements: [
       {
@@ -46,7 +52,7 @@ const serverlessConfiguration: Serverless = {
       {
         Effect: "Allow",
         Action: "sqs:*",
-        Resource: SQS_ARN
+        Resource: '${self:custom.SQSQueueArn}'
       }
     ]
   },
